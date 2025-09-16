@@ -148,6 +148,14 @@ func (us *UserService) Register(ctx context.Context, req *dto.RegisterRequest) (
 	return response, nil
 }
 
-func (us *UserService) Update(ctx context.Context, req *dto.UpdateRequest) (*dto.LoginResponse, error) {
+func (us *UserService) Update(ctx context.Context, req *dto.UpdateRequest, username string) (*dto.UserResponse, error) {
+	return nil, nil
+}
+
+func (us *UserService) GetUserLogin(ctx context.Context) (*dto.UserResponse, error) {
+	return nil, nil
+}
+
+func (us *UserService) GetUserByUUID(ctx context.Context, uuid string) (*dto.UserResponse, error) {
 	return nil, nil
 }
