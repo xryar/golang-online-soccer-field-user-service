@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	errWrap "user-service/common/error"
 	errConstant "user-service/constants/error"
 	"user-service/domain/dto"
@@ -63,14 +64,47 @@ func (ur *UserRepository) Update(ctx context.Context, req *dto.UpdateRequest, uu
 	return &user, nil
 }
 
-func (ur *UserRepository) FindByUsername(context.Context, string) (*models.User, error) {
+func (ur *UserRepository) FindByUsername(ctx context.Context, username string) (*models.User, error) {
+	var user models.User
 
+	err := ur.db.WithContext(ctx).Preload("Role").Where("username = ?", username).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errConstant.ErrUserNotFound
+		}
+
+		return nil, errWrap.WrapError(errConstant.ErrSQLError)
+	}
+
+	return &user, nil
 }
 
-func (ur *UserRepository) FindByEmail(context.Context, string) (*models.User, error) {
+func (ur *UserRepository) FindByEmail(ctx context.Context, email string) (*models.User, error) {
+	var user models.User
 
+	err := ur.db.WithContext(ctx).Preload("Role").Where("email = ?", email).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errConstant.ErrUserNotFound
+		}
+
+		return nil, errWrap.WrapError(errConstant.ErrSQLError)
+	}
+
+	return &user, nil
 }
 
-func (ur *UserRepository) FindByUUID(context.Context, string) (*models.User, error) {
+func (ur *UserRepository) FindByUUID(ctx context.Context, uuid string) (*models.User, error) {
+	var user models.User
 
+	err := ur.db.WithContext(ctx).Preload("Role").Where("uuid = ?", uuid).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errConstant.ErrUserNotFound
+		}
+
+		return nil, errWrap.WrapError(errConstant.ErrSQLError)
+	}
+
+	return &user, nil
 }
