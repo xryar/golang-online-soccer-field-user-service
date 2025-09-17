@@ -27,7 +27,7 @@ func NewUserController(service services.IRegistryService) IUserController {
 	return &UserController{service: service}
 }
 
-func (us *UserController) Login(ctx *gin.Context) {
+func (uc *UserController) Login(ctx *gin.Context) {
 	request := &dto.LoginRequest{}
 
 	err := ctx.ShouldBindJSON(request)
@@ -57,7 +57,7 @@ func (us *UserController) Login(ctx *gin.Context) {
 		return
 	}
 
-	user, err := us.service.GetUser().Login(ctx, request)
+	user, err := uc.service.GetUser().Login(ctx, request)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResponse{
 			Code: http.StatusBadRequest,
@@ -76,7 +76,7 @@ func (us *UserController) Login(ctx *gin.Context) {
 	})
 }
 
-func (us *UserController) Register(ctx *gin.Context) {
+func (uc *UserController) Register(ctx *gin.Context) {
 	request := &dto.RegisterRequest{}
 
 	err := ctx.ShouldBindJSON(request)
@@ -106,7 +106,7 @@ func (us *UserController) Register(ctx *gin.Context) {
 		return
 	}
 
-	user, err := us.service.GetUser().Register(ctx, request)
+	user, err := uc.service.GetUser().Register(ctx, request)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResponse{
 			Code: http.StatusBadRequest,
@@ -125,13 +125,86 @@ func (us *UserController) Register(ctx *gin.Context) {
 }
 
 func (uc *UserController) Update(ctx *gin.Context) {
+	request := &dto.UpdateRequest{}
+	uuid := ctx.Param("uuid")
 
+	err := ctx.ShouldBindJSON(request)
+	if err != nil {
+		response.HttpResponse(response.ParamHTTPResponse{
+			Code: http.StatusBadRequest,
+			Err:  err,
+			Gin:  ctx,
+		})
+
+		return
+	}
+
+	validate := validator.New()
+	err = validate.Struct(request)
+	if err != nil {
+		errMessage := http.StatusText(http.StatusUnprocessableEntity)
+		errResponse := errWrap.ErrValidationResponse(err)
+		response.HttpResponse(response.ParamHTTPResponse{
+			Code:    http.StatusUnprocessableEntity,
+			Message: &errMessage,
+			Data:    errResponse,
+			Err:     err,
+			Gin:     ctx,
+		})
+
+		return
+	}
+
+	user, err := uc.service.GetUser().Update(ctx, request, uuid)
+	if err != nil {
+		response.HttpResponse(response.ParamHTTPResponse{
+			Code: http.StatusBadRequest,
+			Err:  err,
+			Gin:  ctx,
+		})
+
+		return
+	}
+
+	response.HttpResponse(response.ParamHTTPResponse{
+		Code: http.StatusOK,
+		Data: user,
+		Gin:  ctx,
+	})
 }
 
 func (uc *UserController) GetUserLogin(ctx *gin.Context) {
+	user, err := uc.service.GetUser().GetUserLogin(ctx.Request.Context())
+	if err != nil {
+		response.HttpResponse(response.ParamHTTPResponse{
+			Code: http.StatusBadRequest,
+			Err:  err,
+			Gin:  ctx,
+		})
+		return
+	}
 
+	response.HttpResponse(response.ParamHTTPResponse{
+		Code: http.StatusOK,
+		Data: user,
+		Gin:  ctx,
+	})
 }
 
 func (uc *UserController) GetUserByUUID(ctx *gin.Context) {
+	user, err := uc.service.GetUser().GetUserByUUID(ctx.Request.Context(), ctx.Param("uuid"))
+	if err != nil {
+		response.HttpResponse(response.ParamHTTPResponse{
+			Code: http.StatusBadRequest,
+			Err:  err,
+			Gin:  ctx,
+		})
+		return
+	}
 
+	response.HttpResponse(response.ParamHTTPResponse{
+		Code: http.StatusOK,
+		Data: user,
+		Gin:  ctx,
+	})
 }
