@@ -118,7 +118,7 @@ func (us *UserService) Register(ctx context.Context, req *dto.RegisterRequest) (
 	}
 
 	if us.isEmailExist(ctx, req.Email) {
-		return nil, errConstant.ErrUsernameExist
+		return nil, errConstant.ErrEmailExist
 	}
 
 	if req.Password != req.ConfirmPassword {
