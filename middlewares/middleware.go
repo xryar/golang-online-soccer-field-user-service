@@ -51,7 +51,7 @@ func RateLimiter(lmt *limiter.Limiter) gin.HandlerFunc {
 }
 
 func extractBearerToken(token string) string {
-	arrayToken := strings.Split(token, "")
+	arrayToken := strings.Split(token, " ")
 	if len(arrayToken) == 2 {
 		return arrayToken[1]
 	}
@@ -120,7 +120,7 @@ func Authenticate() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var err error
 		token := ctx.GetHeader(constants.Authorization)
-		if token != "" {
+		if token == "" {
 			responseUnauthorized(ctx, errConstant.ErrUnauthorized.Error())
 			return
 		}

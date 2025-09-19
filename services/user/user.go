@@ -126,11 +126,12 @@ func (us *UserService) Register(ctx context.Context, req *dto.RegisterRequest) (
 	}
 
 	user, err := us.repository.GetUser().Register(ctx, &dto.RegisterRequest{
-		Name:     req.Name,
-		Username: req.Username,
-		Password: string(hashedPassword),
-		Email:    req.Email,
-		RoleID:   constants.Customer,
+		Name:        req.Name,
+		Username:    req.Username,
+		Password:    string(hashedPassword),
+		PhoneNumber: req.PhoneNumber,
+		Email:       req.Email,
+		RoleID:      constants.Customer,
 	})
 	if err != nil {
 		return nil, err
@@ -234,7 +235,6 @@ func (us *UserService) GetUserLogin(ctx context.Context) (*dto.UserResponse, err
 		Username:    userLogin.Username,
 		PhoneNumber: userLogin.PhoneNumber,
 		Email:       userLogin.Email,
-		Role:        userLogin.Role,
 	}
 
 	return &data, nil
